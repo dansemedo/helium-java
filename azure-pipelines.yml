@@ -22,7 +22,7 @@ stages:
     steps:
     - task: AzureCLI@1
       inputs:
-        azureSubscription: 'My Azure Subscription'
+        azureSubscription: 'az sub'
         scriptLocation: 'inlineScript'
         inlineScript: 'az acr login --name $(appName)heliumacr
           docker build --target=release -t $(appName)heliumacr.azurecr.io/helium:canary .
