@@ -20,46 +20,41 @@ stages:
       vmImage: 'ubuntu-latest'
 
     steps:
-    - task: Bash@3
+    - task: AzureCLI@1
       inputs:
-        targetType: 'inline'
-        script: 'echo test 1'
+        azureSubscription: 'My Azure Subscription'
+        scriptLocation: 'inlineScript'
+        inlineScript: 'az acr login --name $(appName)heliumacr
+          docker build --target=release -t $(appName)heliumacr.azurecr.io/helium:canary .
+          docker push $(appName)heliumacr.azurecr.io/helium:canary'
 
-    # - task: AzureCLI@1
-    #   inputs:
-    #     azureSubscription: 'My Azure Subscription'
-    #     scriptLocation: 'inlineScript'
-    #     inlineScript: 'az acr login --name $(appName)heliumacr
-    #       docker build --target=release -t $(appName)heliumacr.azurecr.io/helium:canary
-    #       docker push $(appName)heliumacr.azurecr.io/helium:canary'
-
-- stage: Code_Analysis
-  displayName: Check Code Quality with Sonar
-  dependsOn: Build_Container
-  condition: succeeded() 
-  jobs:
-  - job: CodeAnalysis
+# - stage: Code_Analysis
+#   displayName: Check Code Quality with Sonar
+#   dependsOn: Build_Container
+#   condition: succeeded() 
+#   jobs:
+#   - job: CodeAnalysis
     
-    pool:
-      vmImage: 'ubuntu-latest'
+#     pool:
+#       vmImage: 'ubuntu-latest'
 
-    steps:
-    - task: Bash@3
-      inputs:
-        targetType: 'inline'
-        script: 'echo test 2'
+#     steps:
+#     - task: Bash@3
+#       inputs:
+#         targetType: 'inline'
+#         script: 'echo test 2'
 
-- stage: Integration_Tests
-  displayName: Run Integration Tests with the new App in Azure
-  dependsOn: Code_Analysis
-  condition: succeeded() 
-  jobs:
-  - job: Integrationtest
-    pool:
-      vmImage: 'ubuntu-latest'
+# - stage: Integration_Tests
+#   displayName: Run Integration Tests with the new App in Azure
+#   dependsOn: Code_Analysis
+#   condition: succeeded() 
+#   jobs:
+#   - job: Integrationtest
+#     pool:
+#       vmImage: 'ubuntu-latest'
 
-    steps:
-    - task: Bash@3
-      inputs:
-        targetType: 'inline'
-        script: 'echo test 3'
+#     steps:
+#     - task: Bash@3
+#       inputs:
+#         targetType: 'inline'
+#         script: 'echo test 3'
