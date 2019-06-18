@@ -1,0 +1,8 @@
+azure-pipelines.yaml
+.git
+.vscode
+.cache
+**/*.class
+*.md
+/target
+.mvn
