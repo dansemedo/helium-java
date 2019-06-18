@@ -9,7 +9,7 @@ ADD pom.xml $HOME
 FROM base AS dependencies
 RUN mvn verify clean --fail-never
 ADD . $HOME
-RUN mvn package
+RUN mvn package -DskipITs
 
 #
 # ---- Release App ----
