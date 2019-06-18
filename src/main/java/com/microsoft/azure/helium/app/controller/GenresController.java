@@ -1,4 +1,4 @@
-package com.microsoft.azure.helium.controller;
+package com.microsoft.azure.helium.app.controller;
 
 import java.util.Arrays;
 import java.util.List;

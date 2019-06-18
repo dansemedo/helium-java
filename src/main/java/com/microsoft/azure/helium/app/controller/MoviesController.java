@@ -1,9 +1,9 @@
-package com.microsoft.azure.helium.controller;
+package com.microsoft.azure.helium.app.controller;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.microsoft.azure.helium.model.Movie;
+import com.microsoft.azure.helium.app.model.Movie;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

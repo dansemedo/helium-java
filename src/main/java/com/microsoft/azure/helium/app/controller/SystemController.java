@@ -1,4 +1,4 @@
-package com.microsoft.azure.helium.controller;
+package com.microsoft.azure.helium.app.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

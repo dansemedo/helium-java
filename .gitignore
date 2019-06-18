@@ -50,3 +50,6 @@ hs_err_pid*
 
 ### VS Code ###
 .vscode/
+
+### Spring Data CosmosDB Generated files ###
+*.dll

@@ -1,11 +1,16 @@
-package com.microsoft.azure.helium.model;
+package com.microsoft.azure.helium.app.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.microsoft.azure.helium.config.Constants;
+
+import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
+
 /**
  * Actor
  */
+@Document(collection = Constants.DEFAULT_ACTOR_COLLECTION_NAME)
 public class Actor {
     private String id;
     private String actorId;

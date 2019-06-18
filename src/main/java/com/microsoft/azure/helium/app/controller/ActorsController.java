@@ -1,10 +1,14 @@
-package com.microsoft.azure.helium.controller;
+package com.microsoft.azure.helium.app.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-import com.microsoft.azure.helium.model.Actor;
+import com.microsoft.azure.helium.app.model.Actor;
+import com.microsoft.azure.helium.app.repository.ActorsRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +33,26 @@ import io.swagger.annotations.ApiResponse;
 @Api(tags = "Actors")
 public class ActorsController {
 
+    @Autowired
+    private ActorsRepository repository;
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ApiOperation(value = "Get all actors", notes = "Retrieve and return all actors")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "List of actor objects") })
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "List of actor objects") })
     public ResponseEntity<List<Actor>> getAllActors(
-            @ApiParam(value = "The actor name to filter by") @RequestParam("q") String query) {
-        Actor actor = new Actor();
-        return new ResponseEntity<>(Arrays.asList(actor), HttpStatus.OK);
+            @ApiParam(value = "The actor name to filter by", required = false) @RequestParam("q") String query) {
+
+        // Actor actor = new Actor();
+        // actor.setId("19283");
+        // actor.setName("Joe");
+        // repository.save(actor);
+
+        Iterable<Actor> actors = repository.findAll();
+        List<Actor> actorsList = StreamSupport
+            .stream(actors.spliterator(), false)
+            .collect(Collectors.toList());
+
+        return new ResponseEntity<>(actorsList, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -43,8 +60,7 @@ public class ActorsController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The actor object"),
             @ApiResponse(code = 404, message = "An actor with the specified ID was not found") })
-    public ResponseEntity<Actor> getActor(
-            @ApiParam(value = "The ID of the actor to look for", required = true) @PathVariable("id") String index) {
+    public ResponseEntity<Actor> getActor(@ApiParam(value = "The ID of the actor to look for", required = true) @PathVariable("id") String id) {
         Actor actor = new Actor();
         return new ResponseEntity<>(actor, HttpStatus.OK);
     }
@@ -53,9 +69,8 @@ public class ActorsController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Create actor", notes = "Creates an actor")
     @ApiResponses(value = { @ApiResponse(code = 201, message = "The created actor") })
-    public ResponseEntity<List<Actor>> createActor() {
+    public ResponseEntity<Actor> createActor() {
         Actor actor = new Actor();
-        return new ResponseEntity<>(Arrays.asList(actor), HttpStatus.OK);
+        return new ResponseEntity<>(actor, HttpStatus.OK);
     }
-
 }

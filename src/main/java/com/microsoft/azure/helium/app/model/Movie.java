@@ -1,4 +1,4 @@
-package com.microsoft.azure.helium.model;
+package com.microsoft.azure.helium.app.model;
 
 import java.util.ArrayList;
 import java.util.List;
