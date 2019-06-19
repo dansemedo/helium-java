@@ -1,12 +1,7 @@
-package com.microsoft.azure.helium.app.controller;
+package com.microsoft.azure.helium.app.actor;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import com.microsoft.azure.helium.app.model.Actor;
-import com.microsoft.azure.helium.app.repository.ActorsRepository;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,25 +29,15 @@ import io.swagger.annotations.ApiResponse;
 public class ActorsController {
 
     @Autowired
-    private ActorsRepository repository;
+    private ActorsService service;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ApiOperation(value = "Get all actors", notes = "Retrieve and return all actors")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "List of actor objects") })
     public ResponseEntity<List<Actor>> getAllActors(
-            @ApiParam(value = "The actor name to filter by", required = false) @RequestParam("q") String query) {
-
-        // Actor actor = new Actor();
-        // actor.setId("19283");
-        // actor.setName("Joe");
-        // repository.save(actor);
-
-        Iterable<Actor> actors = repository.findAll();
-        List<Actor> actorsList = StreamSupport
-            .stream(actors.spliterator(), false)
-            .collect(Collectors.toList());
-
-        return new ResponseEntity<>(actorsList, HttpStatus.OK);
+            @ApiParam(value = "The actor name to filter by", required = false) @RequestParam("q") final String query) {
+        List<Actor> actors = service.getAllActors(query);
+        return new ResponseEntity<>(actors, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -60,17 +45,21 @@ public class ActorsController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The actor object"),
             @ApiResponse(code = 404, message = "An actor with the specified ID was not found") })
-    public ResponseEntity<Actor> getActor(@ApiParam(value = "The ID of the actor to look for", required = true) @PathVariable("id") String id) {
-        Actor actor = new Actor();
-        return new ResponseEntity<>(actor, HttpStatus.OK);
+    public ResponseEntity<Actor> getActor(@ApiParam(value = "The ID of the actor to look for", required = true) @PathVariable("id") final String actorId) {
+        Optional<Actor> actor = service.getActor(actorId);
+        if (actor.isPresent()) {
+            return new ResponseEntity<>(actor.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Create actor", notes = "Creates an actor")
     @ApiResponses(value = { @ApiResponse(code = 201, message = "The created actor") })
-    public ResponseEntity<Actor> createActor() {
-        Actor actor = new Actor();
-        return new ResponseEntity<>(actor, HttpStatus.OK);
+    public ResponseEntity<Actor> createActor(final Actor actor) {
+        Actor savedActor = service.createActor(actor);
+        return new ResponseEntity<>(savedActor, HttpStatus.OK);
     }
 }
