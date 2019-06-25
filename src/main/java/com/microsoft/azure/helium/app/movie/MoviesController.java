@@ -35,7 +35,7 @@ public class MoviesController {
     @ApiOperation(value = "Get all movies", notes = "Retrieve and return all movies")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "List of movie objects") })
     public ResponseEntity<List<Movie>> getAllMovies(
-            @ApiParam(value = "The movie title to filter by") @RequestParam("q") final String query) {
+            @ApiParam(value = "The movie title to filter by", required = false) @RequestParam("q") final Optional<String> query) {
         List<Movie> movies = service.getAllMovies(query);
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
@@ -49,9 +49,9 @@ public class MoviesController {
             @ApiParam(value = "The ID of the movie to look for", required = true) @PathVariable("id") final String movieId) {
         Optional<Movie> movie = service.getMovie(movieId);
         if (movie.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
             return new ResponseEntity<>(movie.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

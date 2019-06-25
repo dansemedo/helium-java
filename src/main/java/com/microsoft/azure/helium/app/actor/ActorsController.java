@@ -35,7 +35,7 @@ public class ActorsController {
     @ApiOperation(value = "Get all actors", notes = "Retrieve and return all actors")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "List of actor objects") })
     public ResponseEntity<List<Actor>> getAllActors(
-            @ApiParam(value = "The actor name to filter by", required = false) @RequestParam("q") final String query) {
+            @ApiParam(value = "The actor name to filter by", required = false) @RequestParam("q") final Optional<String> query) {
         List<Actor> actors = service.getAllActors(query);
         return new ResponseEntity<>(actors, HttpStatus.OK);
     }

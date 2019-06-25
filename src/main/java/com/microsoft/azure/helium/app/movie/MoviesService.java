@@ -16,11 +16,11 @@ public class MoviesService {
     @Autowired
     private MoviesRepository repository;
 
-    public List<Movie> getAllMovies(String query) {
-        if (StringUtils.isEmpty(query)) {
-            return (List<Movie>) repository.findAll();
+    public List<Movie> getAllMovies(Optional<String> query) {
+        if (query.isPresent() && !StringUtils.isEmpty(query.get())) {
+            return repository.findByTextSearchContaining(query.get().toLowerCase());
         } else {
-            return repository.findByTextSearchContaining(query.toLowerCase());
+            return (List<Movie>) repository.findAll();
         }
     }
 

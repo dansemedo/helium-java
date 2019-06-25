@@ -16,11 +16,11 @@ public class ActorsService {
     @Autowired
     private ActorsRepository repository;
 
-    public List<Actor> getAllActors(String query) {
-        if (StringUtils.isEmpty(query)) {
-            return (List<Actor>) repository.findAll();
+    public List<Actor> getAllActors(Optional<String> query) {
+        if (query.isPresent() && !StringUtils.isEmpty(query.get())) {
+            return repository.findByTextSearchContaining(query.get().toLowerCase());
         } else {
-            return repository.findByTextSearchContaining(query.toLowerCase());
+            return (List<Actor>) repository.findAll();
         }
     }
 
