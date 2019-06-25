@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * AppConfiguration
+ * RepositoryConfig
  */
 @Configuration
 @EnableDocumentDbRepositories(basePackages = "com.microsoft.azure.helium.app.*")
-public class AppConfiguration extends AbstractDocumentDbConfiguration {
+public class RepositoryConfig extends AbstractDocumentDbConfiguration {
 
     @Value("${azure.cosmosdb.uri}")
     private String uri;
