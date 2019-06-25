@@ -17,7 +17,7 @@ public class AppConfiguration extends AbstractDocumentDbConfiguration {
     @Value("${azure.cosmosdb.uri}")
     private String uri;
 
-    @Value("${cosmosdbkey}")
+    @Value("${azure.cosmosdb.key}")
     private String key;
 
     @Value("${azure.cosmosdb.database}")
