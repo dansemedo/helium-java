@@ -1,67 +1,103 @@
-# Setting Up Azure Monitor
+# Azure Cosmos DB
 
-## What is Azure Monitor?
+## What is Azure Cosmos DB?
 
-Azure Monitor is a Microsoft service which allows users to view metrics and logs from different Azure resources. This can include application monitoring data, Azure resource monitoring data, OS monitoring data, and more.
+Azure Cosmos DB is Microsoft's globally distributed, multi-model database service. With a click of a button, Cosmos DB enables you to elastically and independently scale throughput and storage across any number of Azure regions worldwide. You can elastically scale throughput and storage, and take advantage of fast, single-digit-millisecond data access using your favorite API including **SQL**, **MongoDB**, **Cassandra**, **Tables**, or **Gremlin**. Cosmos DB provides comprehensive service level agreements (SLAs) for throughput, latency, availability, and consistency guarantees, something no other database service offers.
 
-## How to use it
+## How to create a database
 
-Azure dashboards allows users to pin and display their Azure Monitor metrics and logs into a single pane. Types of information that can be added to a dashboard include, but are not limited to: Azure Monitor elements, outputs from log queries, or metric charts from Application Insights. Once created, dashboards can be shared for viewing and editing with other Azure users. Read more on this at https://docs.microsoft.com/en-us/azure/azure-monitor/overview.
+Please follow the section *Create a database account* under [this Quickstart tutorial](https://docs.microsoft.com/en-us/azure/cosmos-db/create-sql-api-java#create-a-database-account)
 
-## Create a Dashboard
+## Cosmos DB and Spring
 
-There are multiple ways to create a dashboard on Azure. One way is to create an empty dashboard and customize it by adding new items. Otherwise, users can use the dashboard which is automatically created for them with Azure resources, such as Application Insights.
+There way several ways of starting integrating Cosmos DB and Java projects. Specific targeting Spring web applications, [Spring Data](https://spring.io/projects/spring-data) provides a consistent programming model for data access in Cosmos through repository pattern.
 
-### Option A: Create Custom Dashboard
+This can be easily done using one of the following APIs:
 
-First, navigate to azure.microsoft.com to begin creating a new dashboard. Once on the main page, click on the list item named "Dashboard" from the left menu panel.
+* [Spring Data for Cosmos DB (SQL API)](https://github.com/microsoft/spring-data-cosmosdb)
+* [Spring Data MongoDB](https://spring.io/projects/spring-data-mongodb)
+* [Spring Data for Apache Cassandra](https://spring.io/projects/spring-data-cassandra)
+* [Spring Data for Gremlin](https://github.com/microsoft/spring-data-gremlin)
 
-![image](imgs/portal.png)
+We choose to use Spring Data for Cosmos (SQL) in the current Helium project.
 
-A new menu will show up on the top, where '+ New dashboard' is displayed. Click this to begin customizing.
+### Create and consume repositories
 
-![image](imgs/dashselection.png)
+Usually you start defining an entity:
 
-'Tile Gallery' allows users to select items to drag onto the dashboard and customize from their Azure Resources. Select 'Metrics Chart', and click 'Add' to add Metrics Charts from Azure Monitoring.
+```java
+@Getter
+@AllArgsConstructor
+public class Genre {
+    private String id;
+    private String genre;
+}
+```
 
-![image](imgs/tilegallery.png)
+Then, just create an interface that extends a Spring data repository. In our case, `DocumentDbRepository`.
 
-Once selected, a new page is loaded where the user can select which resource group to preview metrics from. For example, available metrics for a Cosmos DB resource include available storage, data usage, metadata requests, and more.
+```java
+@Repository
+public interface GenresRepository extends DocumentDbRepository<Genre, String> {
+}
+```
 
-![image](imgs/editmetric.png)
+> The repository interface `DocumentDbRepository<TEntity, TKey>` accepts `TEntity` as the main entity type, and `TKey` as the key type.
 
-Once finished with the metrics, select 'Pin to current dashboard' on the far right side to add it to the dashboard made previously.
+After that, you can use methods from an autowired repository, such as:
 
-![image](imgs/pintodash.png)
+```java
+@Service
+public class GenresService {
 
-Displayed is the new metric added to a custom dashboard! Continue to add more metrics from selecting the 'edit' menu item on the dashboard page, until the dashboard feels complete.
+    @Autowired
+    private GenresRepository repository;
 
-![image](imgs/cosmosdash.png)
+    public void doSomething(){
+        String id = UUID.randomUUID().toString();
+        Genre genre = new Genre(id, "Sci-Fi");
+        repository.save(genre);
 
-### Option B: Use Pre-populated Dashboard
+        boolean exists = repository.existsById(id);
 
-Navigate to 'Resource Groups', then select the resource group which contains the Application Insights Resource. Once opened, a screen which looks like the following will show up.
+        Optional<Genre> genreFind = repository.findById(id);
 
-![image](imgs/appinsightRG.png)
+        repository.delete(genre);
 
-Once here, click on 'Application Dashboard'.
+        long count = repository.count();
 
-[image](imgs/appinsightdash.png)
+        Iterable<Genre> genres = repository.findAll();
 
-Here, a beautiful dashboard has been pre-created for the user. As seen before in Option A, more items can be added to this dashboard from the 'tile gallery' or individual resource groups.
+        repository.deleteAll();
+    }
+}
+```
 
-#### Edit from Dashboard Page
+## Custom Queries
 
-From the Dashboard page - select 'edit' to add items from the Tile Gallery.
+Spring Data support custom query creation from methods names. As stated in [the official documentation](https://docs.spring.io/spring-data/commons/docs/current/reference/html/#repositories.query-methods.details), here are some examples for a Person repository:
 
-![image](imgs/edit.png)
+```java
+interface PersonRepository extends Repository<User, Long> {
 
-#### Edit from Resource Group Pages
+  List<Person> findByEmailAddressAndLastname(EmailAddress emailAddress, String lastname);
 
-Or, go into a resource group and pin an item from the individual resource group page itself by selecting the pin in the far right corner.
+  // Enables the distinct flag for the query
+  List<Person> findDistinctPeopleByLastnameOrFirstname(String lastname, String firstname);
+  List<Person> findPeopleDistinctByLastnameOrFirstname(String lastname, String firstname);
 
-![image](imgs/editresourceg.png)
+  // Enabling ignoring case for an individual property
+  List<Person> findByLastnameIgnoreCase(String lastname);
+  // Enabling ignoring case for all suitable properties
+  List<Person> findByLastnameAndFirstnameAllIgnoreCase(String lastname, String firstname);
 
-Once all dashboards are complete, select 'share', and add a subscription group in order to share with other Azure users.
+  // Enabling static ORDER BY for a query
+  List<Person> findByLastnameOrderByFirstnameAsc(String lastname);
+  List<Person> findByLastnameOrderByFirstnameDesc(String lastname);
+}
+```
 
-![image](imgs/share.png)
+## Cross-partition queries
+
+If you have partitioned your data, there are some limitations when querying data.
+Please see instructions at [How to Query Partitioned Azure Cosmos DB Collection](https://github.com/microsoft/spring-data-cosmosdb/blob/master/QueryPartitionedCollection.md)
