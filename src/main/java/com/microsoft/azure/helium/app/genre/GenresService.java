@@ -1,6 +1,5 @@
 package com.microsoft.azure.helium.app.genre;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

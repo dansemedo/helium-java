@@ -15,7 +15,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfig {                                    
+public class SwaggerConfig {     
+
     @Bean
     public Docket api() { 
         return new Docket(DocumentationType.SWAGGER_2)
@@ -26,7 +27,6 @@ public class SwaggerConfig {
             .build()
           .apiInfo(apiInfo());                 
     }
-
     
     private ApiInfo apiInfo() {
         return new ApiInfo(
